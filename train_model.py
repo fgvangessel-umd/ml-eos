@@ -1,4 +1,5 @@
 import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import sys
 import time
 import torch
@@ -27,6 +28,8 @@ from src.viz_funcs import viz_train_loss, viz_pred_dist, viz_eos_data
 from src.monitor_funcs import plot_initial_dist, print_progress
 
 from utils.printarr import printarr
+
+sys.exit('DBEUGGING')
 
 # Check CUDA availability
 print(torch.cuda.is_available())

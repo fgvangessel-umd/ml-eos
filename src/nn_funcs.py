@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from torch import nn
-from printarr import printarr
+from utils.printarr import printarr
 
 ###
 ### Define NN architecture

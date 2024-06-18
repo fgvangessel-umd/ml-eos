@@ -1,8 +1,8 @@
 import torch
 from torch import nn
-from printarr import printarr
-from viz_funcs import viz_eos_data, viz_train_loss, viz_dist
-from data_funcs import concatenate_data
+from utils.printarr import printarr
+from src.viz_funcs import viz_eos_data, viz_train_loss, viz_dist
+from src.data_funcs import concatenate_data
 
 def print_progress(loss, res, iepoch):
     if (iepoch==0):

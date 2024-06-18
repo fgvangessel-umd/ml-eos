@@ -17,7 +17,8 @@ from torch.utils.data import DataLoader
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torch import nn
-from printarr import printarr
+
+from utils.printarr import printarr
 
 def gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, n,device='cuda', data_sample_type='grid', scaler_type='standard'):
     '''
