@@ -1,6 +1,7 @@
 # ML EOS
 
-![Thermo-Informed Neural network](results/plots/nn_eos_graphic.png){width=40% height=40%}{: .shadow}
+[//] ![Thermo-Informed Neural network](results/plots/nn_eos_graphic.png){width=40% height=40%}{: .shadow}
+<img src=results/plots/nn_eos_graphic.png alt="Thermo-Informed Neural network" width=40% height=40%>
 
 The ML EOS package provides a complete Python framework for training a deep neural network from scratch to reproduce a legacy (JWL) equation of state (EOS). The JWL EOS has been widely used to represent the thermodynamic equation relating the state variables of an ideal explosive product gases behind a detonation front. The JWL expression for pressure and sound velocity are:
 
