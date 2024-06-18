@@ -2,6 +2,7 @@
 This template provides a basic file structure for organizing and recording project workflows for various lab research projects.
 After cloning a version of this template, your local file system may look something like the following (modified from [JuliaDynamics' Dr. Watson](https://juliadynamics.github.io/DrWatson.jl/dev/) so you may need to modify slightly for Python or other languages as per your specific needs):
 ```
+
 │projectdir          <- Project's main folder. It is initialized as a Git
 │                       repository with a reasonable .gitignore file.
 │
