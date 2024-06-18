@@ -1,46 +1,27 @@
-# IDEAL Lab Project GitHub Template
-This template provides a basic file structure for organizing and recording project workflows for various lab research projects.
-After cloning a version of this template, your local file system may look something like the following (modified from [JuliaDynamics' Dr. Watson](https://juliadynamics.github.io/DrWatson.jl/dev/) so you may need to modify slightly for Python or other languages as per your specific needs):
+# ML EOS
+
+![Thermo-Informed Neural network](results/plots/nn_eos_graphic.png){width=40% height=40%}{: .shadow}
+
+The ML EOS package provides a complete Python framework for training a deep neural network from scratch to reproduce a legacy (JWL) equation of state (EOS). The JWL EOS has been widely used to represent the thermodynamic equation relating the state variables of an ideal explosive product gases behind a detonation front. The JWL expression for pressure and sound velocity are:
+
+```math
+P(\rho, e) = A \left[ 1 - \frac{\omega \rho}{\rho_0 R_1} \right] e^{-\frac{R_1 \rho_0}{\rho}} +B \left[ 1 - \frac{\omega \rho}{\rho_0 R_2} \right] e^{-\frac{R_2 \rho_0}{\rho}} + \omega e \rho   \qquad ; \qquad   c^2(\rho, e) = \left( \frac{\partial P}{\partial \rho} \right)_e + \frac{P}{\rho^2} \left( \frac{\partial P}{\partial e} \right)_{\rho}
 ```
-│projectdir          <- Project's main folder. It is initialized as a Git
-│                       repository with a reasonable .gitignore file.
-│
-├── _notes           <- WIP scripts, code, notes, comments,
-│   |                   to-dos and anything in an alpha state.
-│   └── tmp          <- Temporary data folder.
-│
-├── data             <- **Immutable and add-only for project data**
-|                       Depending on project this may import repo submodules
-│
-├── results          <- For outputs needed for reports or papers.
-│   |                   
-│   └── plots        <- Self explanatory
-│   └── videos       <- Can be actual video streams or just gifs/animation files
-│   └── tables       <- If helpful to store for papers.
-|
-├── notebooks        <- Jupyter, Weave or any other mixed media notebooks.
-|                       Can reference files in src or utils.
-│
-├── papers           <- Scientific papers resulting from the project.
-|   |                   This will load overleaf links as git submodules.
-│   └── reports      <- May also link to report files for sponsor.
-|                       
-├── scripts          <- Various scripts, e.g. simulations, plotting, analysis,
-│                       The scripts use the `src` folder for their base code.
-│
-├── src              <- Source code for use in this project. Contains functions,
-│                       structures and modules that are used throughout
-│                       the project and in multiple scripts.
-|
-├── utils            <- Utility functions brought in from other repos.
-|                       May be implemented as submodules if needed (e.g. plotting).
-│
-├── README.md        <- Optional top-level README for anyone using this project.
-├── .gitignore       <- may ignore _notes, data, plots, videos, notebooks,
-|                       and latex-compilation related files, etc. as needed
-│
-├── Manifest.toml    <- Contains full list of exact package versions used currently.
-└── Project.toml     <- Main project file, allows activation and installation.
-                        Above files can be customized depending on your language
-                        Key idea is to make it easy to activate the virtual env
+
+## Installation
+
+You can install and utilize this repo by executing the following commands
+
+```bash
+git clone git@gitlabserver:francis.g.vangessel.civ/ml_eos.git
+cd ml_eos
+conda env create -f torch_env_reqs.yml
+conda activate torch_env
+python train_model
 ```
+
+## Usage
+
+Changes to the default parameters of this project (e.g. JWL EOS parameters, training hyperparameetrs, and number of training data points) are controlled through the config.yaml file.
+
+![NN Predictions](results/plots/pressure_sound_speed_predictions.png){width=100% height=100%}{: .shadow}
