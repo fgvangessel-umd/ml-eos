@@ -21,12 +21,12 @@ from torch.autograd import Variable
 from torch import nn
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
-from data_funcs import gen_eos_data, vecs_to_array, jwl, scale_data, unscale_data, batch_training_data
-from nn_funcs import EOSNeuralNetwork, init_xavier, loss_calculation
-from viz_funcs import viz_train_loss, viz_pred_dist, viz_eos_data
-from monitor_funcs import plot_initial_dist, print_progress
+from src.data_funcs import gen_eos_data, vecs_to_array, jwl, scale_data, unscale_data, batch_training_data
+from src.nn_funcs import EOSNeuralNetwork, init_xavier, loss_calculation
+from src.viz_funcs import viz_train_loss, viz_pred_dist, viz_eos_data
+from src.monitor_funcs import plot_initial_dist, print_progress
 
-from printarr import printarr
+from utils.printarr import printarr
 
 # Check CUDA availability
 print(torch.cuda.is_available())
