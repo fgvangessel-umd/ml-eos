@@ -29,8 +29,6 @@ from src.monitor_funcs import plot_initial_dist, print_progress
 
 from utils.printarr import printarr
 
-sys.exit('DBEUGGING')
-
 # Check CUDA availability
 print(torch.cuda.is_available())
 
@@ -46,6 +44,9 @@ with open('config.yaml') as file:
     scheduler_params   = config_list['scheduler_params']
     training_params    = config_list['training_params']
     checkpoint_params  = config_list['checkpoint_params']
+
+    chckdir = output_dirs['checkpoint_dir']
+    figdir  = output_dirs['figure_dir']
     
 ###
 ### Generate EOS Data
@@ -67,7 +68,7 @@ net.apply(init_xavier)
 optimizer = torch.optim.Adam(net.parameters(), lr=float(training_params['lr']))
 
 # If checkpoint file exists load and initialize training
-chckpt_path = 'checkpoints/final_model.pt'
+chckpt_path = chckdir+'final_model.pt'
 my_file = Path(chckpt_path)
 if my_file.is_file():
     # Load existing model
@@ -79,7 +80,8 @@ if my_file.is_file():
     # Generate data but use pre-existing scaling parameters for normalization
     eos_data, eos_data_scaled, mu, sigma, inputs, targets =\
         gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, ngrid,\
-                        device='cuda', data_sample_type=data_sample_type, scaler_type='checkpoints/scaling.txt')
+                        device='cuda', data_sample_type=data_sample_type, scaler_type=\
+                         chckdir+'scaling.txt')
 
 else:
     # Generate reference EOS data and create train/validation/test split
@@ -88,7 +90,8 @@ else:
                         device='cuda', data_sample_type=data_sample_type, scaler_type=scaler_type)
 
     # Save scaling factors (mu/sigma)
-    np.savetxt('scaling.txt', np.concatenate((mu.reshape(1,-1), sigma.reshape(1,-1)), axis=0), \
+    np.savetxt(chckdir+'scaling.txt', \
+               np.concatenate((mu.reshape(1,-1), sigma.reshape(1,-1)), axis=0), \
                 header=scaler_type, comments='')
 
 #with open('scaling.txt', 'w+') as f:
@@ -211,7 +214,7 @@ for i in range(n_epochs):
         '''
         
         # Checkpoint current best model
-        model_id = 'checkpoints/model_{0:05}.pt'.format(i)
+        model_id = chckdir+'model_{0:05}.pt'.format(i)
         torch.save({
             'model_state_dict': net.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
@@ -229,11 +232,11 @@ t1 = time.time()
 print('Training Time: {0}'.format(t1-t0))
 
 # Visualize loss evolution during training
-fig_loc = 'figures/train_curves.png'
+fig_loc = figdir+'train_curves.png'
 viz_train_loss(loss_hist, res_hist, fig_loc)
 
 # Save loss data
-np.savetxt('checkpoints/loss_hist.txt', loss_hist)
+np.savetxt(chckdir+'loss_hist.txt', loss_hist)
 #np.savetxt('checkpoints/res_hist.txt', res_hist)
 
 # Print minimum loss information

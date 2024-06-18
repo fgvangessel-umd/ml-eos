@@ -1,0 +1,32 @@
+dirs:
+    checkpoint_dir: checkpoints/
+    figure_dir: results/plots/
+
+ref_data_params:
+    rho_bounds: [1.00e-3, 3.0]
+    ei_bounds: [5.00e+9, 1.2e+11]
+    eos_param_symbols: ['A', 'B', 'R1', 'R2', 'omega', 'rho0']
+    eos_params: [5.3121e12, 8.5184e10, 4.6, 1.05, .29, 1.65]
+    ngrid : 400
+    sample_type : lhs
+    scaler_type : minmax
+
+scheduler_params:
+    scheduler_name: 
+    mode: 'min'
+    factor : 0.95
+    patience : 100 
+    min_lr : 1e-5
+    verbose : True
+
+training_params:
+    lr: 1e-3
+    n_epochs: 1_000
+    n_output_epochs: 1_000
+    n_plot_epochs: 50_000
+    batch_size: 8192
+
+checkpoint_params:
+    save_error: 1e-7
+    save_eps : 5e-9
+

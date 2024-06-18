@@ -1,4 +1,5 @@
 import torch
+import yaml
 from torch import nn
 from utils.printarr import printarr
 from src.viz_funcs import viz_eos_data, viz_train_loss, viz_dist
@@ -24,14 +25,19 @@ def print_progress(loss, res, iepoch):
 def viz_progress(scaled_data, data, eos_data_scaled, loss_hist, res_hist, i):
     
     # Visualize distributions
-    dist_fig_loc = 'figures/pred_dist_scaled_iter_{0:05}.png'.format(i)
+    with open('config.yaml') as file:
+        config_list = yaml.load(file, Loader=yaml.FullLoader)
+        output_dirs = config_list['dirs']
+        figdir = output_dirs['figure_dir']
+
+    dist_fig_loc = figdir+'pred_dist_scaled_iter_{0:05}.png'.format(i)
     viz_dist(scaled_data[:,2:], dist_fig_loc)
 
-    dist_fig_loc = 'figures/pred_dist_iter_{0:05}.png'.format(i)
+    dist_fig_loc = figdir+'pred_dist_iter_{0:05}.png'.format(i)
     viz_dist(data[:,2:], dist_fig_loc)
     
     # Visualize scaled predicitions
-    fig_loc = 'figures/scaled_vars_iter_{0:05}.png'.format(i)
+    fig_loc = figdir+'scaled_vars_iter_{0:05}.png'.format(i)
     var_labels = ['Pressure (Scaled)', 'c2 (Scaled)', 'dPdr (Scaled)', 'dPde (Scaled)']
     viz_eos_data(eos_data_scaled, [scaled_data], var_labels, fig_loc)
 
@@ -50,26 +56,33 @@ def viz_progress(scaled_data, data, eos_data_scaled, loss_hist, res_hist, i):
     return None
 
 def plot_initial_dist(eos_data, inputs, targets):
+
+    # Visualize distributions
+    with open('config.yaml') as file:
+        config_list = yaml.load(file, Loader=yaml.FullLoader)
+        output_dirs = config_list['dirs']
+        figdir = output_dirs['figure_dir']
+    
     # Visualize raw and scaled input and target distributions
-    viz_dist(eos_data[:,:2], 'figures/input_dist.png')
-    viz_dist(eos_data[:,2:], 'figures/target_dist.png')
+    viz_dist(eos_data[:,:2], figdir+'input_dist.png')
+    viz_dist(eos_data[:,2:], figdir+'target_dist.png')
 
     # Train distribution
-    viz_dist(inputs[0].detach().cpu().numpy(), 'figures/input_train_dist_scaled.png')
-    viz_dist(targets[0].detach().cpu().numpy(), 'figures/target_train_dist_scaled.png')
+    viz_dist(inputs[0].detach().cpu().numpy(), figdir+'input_train_dist_scaled.png')
+    viz_dist(targets[0].detach().cpu().numpy(), figdir+'target_train_dist_scaled.png')
 
     # Validation distribution
-    viz_dist(inputs[1].detach().cpu().numpy(), 'figures/input_val_dist_scaled.png')
-    viz_dist(targets[1].detach().cpu().numpy(), 'figures/target_val_dist_scaled.png')
+    viz_dist(inputs[1].detach().cpu().numpy(), figdir+'input_val_dist_scaled.png')
+    viz_dist(targets[1].detach().cpu().numpy(), figdir+'target_val_dist_scaled.png')
 
     # Test distribution
-    viz_dist(inputs[2].detach().cpu().numpy(), 'figures/input_test_dist_scaled.png')
-    viz_dist(targets[2].detach().cpu().numpy(), 'figures/target_test_dist_scaled.png')
+    viz_dist(inputs[2].detach().cpu().numpy(), figdir+'input_test_dist_scaled.png')
+    viz_dist(targets[2].detach().cpu().numpy(), figdir+'target_test_dist_scaled.png')
 
     # Total distribution
     x = concatenate_data(inputs[0], inputs[1], inputs[2])
     y = concatenate_data(targets[0], targets[1], targets[2])
-    viz_dist(x.detach().cpu().numpy(), 'figures/input_dist_scaled.png')
-    viz_dist(y.detach().cpu().numpy(), 'figures/target_dist_scaled.png')
+    viz_dist(x.detach().cpu().numpy(), figdir+'input_dist_scaled.png')
+    viz_dist(y.detach().cpu().numpy(), figdir+'target_dist_scaled.png')
 
     return None
