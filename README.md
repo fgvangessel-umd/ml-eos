@@ -24,4 +24,4 @@ python train_model
 
 Changes to the default parameters of this project (e.g. JWL EOS parameters, training hyperparameetrs, and number of training data points) are controlled through the config.yaml file.
 
-![NN Predictions](results/plots/pressure_sound_speed_predictions.png){width=100% height=100%}{: .shadow}
+<img src=results/plots/pressure_sound_speed_predictions.png alt="NN Predictions" width=60% height=60%>
