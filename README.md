@@ -13,7 +13,7 @@ P(\rho, e) = A \left[ 1 - \frac{\omega \rho}{\rho_0 R_1} \right] e^{-\frac{R_1 \
 You can install and utilize this repo by executing the following commands
 
 ```bash
-git clone git@gitlabserver:francis.g.vangessel.civ/ml_eos.git
+git clone git@github.com:fgvangessel-umd/ml-eos.git
 cd ml_eos
 conda env create -f torch_env_reqs.yml
 conda activate torch_env
