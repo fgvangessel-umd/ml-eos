@@ -3,10 +3,10 @@ dirs:
     figure_dir: results/plots/
 
 ref_data_params:
-    rho_bounds: [1.00e-3, 3.0]
+    rho_bounds: [3.0e-3, 3.0]
     ei_bounds: [5.00e+9, 1.2e+11]
     eos_param_symbols: ['A', 'B', 'R1', 'R2', 'omega', 'rho0']
-    eos_params: [5.3121e12, 8.5184e10, 4.6, 1.05, .29, 1.65]
+    eos_params: [5.3e12, 8.5e10, 4.5, 1.0, .3, 1.6]
     ngrid : 400
     sample_type : lhs
     scaler_type : minmax
@@ -21,7 +21,7 @@ scheduler_params:
 
 training_params:
     lr: 1e-3
-    n_epochs: 1_000
+    n_epochs: 100_000
     n_output_epochs: 1_000
     n_plot_epochs: 50_000
     batch_size: 8192
