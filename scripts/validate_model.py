@@ -6,16 +6,16 @@ import sys
 sys.path.insert(1, '../')
 
 import yaml
-from printarr import printarr
+from utils.printarr import printarr
 from matplotlib import pyplot as plt
 
-from data_funcs import gen_eos_data
-from nn_funcs import  EOSNeuralNetwork, compute_c2, init_xavier
-from viz_funcs import plot_surface, plot_contour
+from src.data_funcs import gen_eos_data
+from src.nn_funcs import  EOSNeuralNetwork, compute_c2, init_xavier
+from src.viz_funcs import plot_surface, plot_contour
 
 # Load saved NN
 model_name=str(sys.argv[1])
-scaling_params=str(sys.argv[2])
+scaling_params_file=str(sys.argv[2])
 ngrid=int(sys.argv[3])
 eos=EOSNeuralNetwork()
 
@@ -35,7 +35,8 @@ with open('../config.yaml') as file:
     scheduler_params   = config_list['scheduler_params']
     training_params    = config_list['training_params']
     checkpoint_params  = config_list['checkpoint_params']
-
+figdir  = '../'+output_dirs['figure_dir']
+    
 # ##
 # ## Generate EOS Data
 # ##
@@ -57,7 +58,7 @@ eos_data, eos_data_scaled, mu, sigma, inputs, targets =\
             gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, ngrid,device=device, data_sample_type='grid')
 
 # Load mean and std. dev used for training
-dat = np.loadtxt('../scaling.txt', skiprows=1)
+dat = np.loadtxt(scaling_params_file, skiprows=1)
 mu = dat[0,:]
 sigma = dat[1,:]
 
@@ -66,7 +67,7 @@ for i in range(eos_data_scaled.shape[1]):
 
 fig, ax = plt.subplots(figsize=(24,24))
 ax.scatter(eos_data[:,0], eos_data[:,1], c='k', s=0.5)
-plt.savefig('figures/sampled_data.png')
+plt.savefig(figdir+'sampled_data.png')
 
 # Generate inputs
 r    = eos_data[:,0]
@@ -131,7 +132,7 @@ plot_surface(ax, R, E, DPDR, xlabel='Density[ g/cc]', ylabel='Energy [erg]', zla
 ax = fig.add_subplot(224, projection='3d')
 plot_surface(ax, R, E, DPDE, xlabel='Density[ g/cc]', ylabel='Energy [erg]', zlabel='dPde',)
 plt.show()
-plt.savefig('figures/pressure_jacobian_predictions.png', bbox_inches='tight', dpi=600, pad_inches=1.0)
+plt.savefig(figdir+'pressure_jacobian_predictions.png', bbox_inches='tight', dpi=600, pad_inches=1.0)
 
 
 # Plot pressure and sound velocity abs. error and absolute percent error
@@ -157,7 +158,7 @@ plot_contour(axs[1,2], R, E*1e-10, C_APE, n_contour_lines=4, labels_fmt='%.1e', 
              xlabel='Density [g/cc]', ylabel='Energy [$10^{10} $erg]')
 
 plt.show()
-plt.savefig('figures/errors.png', bbox_inches='tight', dpi=600, pad_inches=1.0)
+plt.savefig(figdir+'errors.png', bbox_inches='tight', dpi=600, pad_inches=1.0)
 
 
 # Calculate errors on fine grid
