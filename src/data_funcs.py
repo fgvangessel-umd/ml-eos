@@ -20,7 +20,7 @@ from torch import nn
 
 from utils.printarr import printarr
 
-def gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, n,device='cuda', data_sample_type='grid', scaler_type='standard'):
+def gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, n,device='cuda', data_sample_type='grid', scaler_type='standard', dtype=torch.float32):
     '''
     Function that generates eos data, density, internal energy, pressure, pressure derivatives, and sound velocity (both scaled and unscaled)
     '''
@@ -70,13 +70,13 @@ def gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, n,device='cuda', 
     inputs_val, inputs_test, targets_val, targets_test = train_test_split(X_test, y_test, test_size=0.5, random_state=1) 
 
     # Move all data to tensors
-    inputs_train = torch.tensor(inputs_train, dtype=torch.float64, requires_grad=True).to(device)
-    inputs_val   = torch.tensor(inputs_val,   dtype=torch.float64, requires_grad=True).to(device)
-    inputs_test  = torch.tensor(inputs_test,  dtype=torch.float64, requires_grad=True).to(device)
+    inputs_train = torch.tensor(inputs_train, dtype=dtype, requires_grad=True).to(device)
+    inputs_val   = torch.tensor(inputs_val,   dtype=dtype, requires_grad=True).to(device)
+    inputs_test  = torch.tensor(inputs_test,  dtype=dtype, requires_grad=True).to(device)
 
-    targets_train = torch.tensor(targets_train, dtype=torch.float64, requires_grad=True).to(device)
-    targets_val   = torch.tensor(targets_val,   dtype=torch.float64, requires_grad=True).to(device)
-    targets_test  = torch.tensor(targets_test,  dtype=torch.float64, requires_grad=True).to(device)
+    targets_train = torch.tensor(targets_train, dtype=dtype, requires_grad=True).to(device)
+    targets_val   = torch.tensor(targets_val,   dtype=dtype, requires_grad=True).to(device)
+    targets_test  = torch.tensor(targets_test,  dtype=dtype, requires_grad=True).to(device)
 
     # Aggregate data
     inputs  = [inputs_train, inputs_val, inputs_test]
@@ -177,7 +177,7 @@ def concatenate_data(*xs):
     return x 
 
 # Create mini-batches
-def batch_training_data(xtrain, ytrain, batch_size):
+def batch_training_data(xtrain, ytrain, batch_size, device, dtype):
     # Calculate total length of dataset and number of batches
     ntrain = xtrain.size()[0]
     nbatch = ntrain//batch_size+1 # Add extra batch to account for situation when number of training data not divisible by batch size
@@ -211,8 +211,8 @@ def batch_training_data(xtrain, ytrain, batch_size):
             batch_length.append(ntrain-i*batch_size)
 
     # Move to GPU
-    X = torch.tensor(X, dtype=torch.float64, requires_grad=True).to('cuda')
-    y = torch.tensor(y, dtype=torch.float64, requires_grad=True).to('cuda')
+    X = torch.tensor(X, dtype=dtype, requires_grad=True).to(device)
+    y = torch.tensor(y, dtype=dtype, requires_grad=True).to(device)
 
     return X, y, nbatch, batch_length
     

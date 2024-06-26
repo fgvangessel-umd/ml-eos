@@ -30,7 +30,17 @@ from src.monitor_funcs import plot_initial_dist, print_progress
 from utils.printarr import printarr
 
 # Check CUDA availability
-print(torch.cuda.is_available())
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+    dtype = torch.float32
+elif torch.cuda.is_available():
+    device = torch.device("cuda")
+    dtype = torch.float64
+    print(torch.cuda.get_device_name(0))
+else:
+    device = torch.device("cpu")
+    dtype = torch.float64
+    print ("MPS or CUDA device not found.")
 
 plt.ioff()
 
@@ -63,7 +73,7 @@ data_sample_type = ref_data_params['sample_type']
 scaler_type = ref_data_params['scaler_type']
 
 # Initialize network define optimizer, and set loss function
-net = EOSNeuralNetwork().to('cuda')
+net = EOSNeuralNetwork(dtype).to(device)
 net.apply(init_xavier)
 optimizer = torch.optim.Adam(net.parameters(), lr=float(training_params['lr']))
 
@@ -80,28 +90,19 @@ if my_file.is_file():
     # Generate data but use pre-existing scaling parameters for normalization
     eos_data, eos_data_scaled, mu, sigma, inputs, targets =\
         gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, ngrid,\
-                        device='cuda', data_sample_type=data_sample_type, scaler_type=\
-                         chckdir+'scaling.txt')
+                        device=device, data_sample_type=data_sample_type, scaler_type=\
+                         chckdir+'scaling.txt', dtype=dtype)
 
 else:
     # Generate reference EOS data and create train/validation/test split
     eos_data, eos_data_scaled, mu, sigma, inputs, targets =\
         gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, ngrid,\
-                        device='cuda', data_sample_type=data_sample_type, scaler_type=scaler_type)
+                        device=device, data_sample_type=data_sample_type, scaler_type=scaler_type, dtype=dtype)
 
     # Save scaling factors (mu/sigma)
     np.savetxt(chckdir+'scaling.txt', \
                np.concatenate((mu.reshape(1,-1), sigma.reshape(1,-1)), axis=0), \
                 header=scaler_type, comments='')
-
-#with open('scaling.txt', 'w+') as f:
-#    f.write(scaler_type+'\n')
-#    f.write(mu)
-#    f.write('\n')
-#    f.write(sigma)
-#fig, ax = plt.subplots(figsize=(12,12))
-#ax.scatter(eos_data[:,0], eos_data[:,1], c='r', s=1)
-#plt.savefig('sampled_data.png')
 
 X_train, X_val, X_test = inputs[0], inputs[1], inputs[2]
 y_train, y_val, y_test = targets[0], targets[1], targets[2]
@@ -111,7 +112,7 @@ plot_initial_dist(eos_data, inputs, targets)
 
 # Create mini-batches for batched training
 batch_size = training_params['batch_size']
-X_batch_train, y_batch_train, nbatch, batch_length = batch_training_data(X_train, y_train, batch_size)
+X_batch_train, y_batch_train, nbatch, batch_length = batch_training_data(X_train, y_train, batch_size, device, dtype)
 
 '''
 # Create LR scheduler
@@ -145,7 +146,6 @@ save_eps   = float(checkpoint_params['save_eps'])
 ###
 ### Train Network
 ###
-
 
 t0 = time.time()
 for i in range(n_epochs):
@@ -188,7 +188,28 @@ for i in range(n_epochs):
     if (i % int(training_params['n_output_epochs']) == 0) or (i==n_epochs-1):
         # Output training data
         print_progress(loss_hist[i,:], res_hist[i, :, :], i)
-    
+
+        _, preds_train, _, _ = loss_calculation(net, X_train, y_train, mu, sigma, weights)
+        # Create scaled data tensor
+        scaled_data_train = torch.cat((X_train, preds_train), axis=1).detach().cpu().numpy()
+        scaled_data_val = torch.cat((X_val, preds_val), axis=1).detach().cpu().numpy()
+        scaled_data_test = torch.cat((X_test, preds_test), axis=1).detach().cpu().numpy()
+
+        # Create unscaled data arrays for viz
+        data_train = unscale_data(scaled_data_train, mu, sigma)
+        data_val = unscale_data(scaled_data_val, mu, sigma)
+        data_test = unscale_data(scaled_data_test, mu, sigma)
+
+        # Visualize current prediction distribution
+        figloc = figdir+'dist_{0:05}'.format(i)
+        viz_pred_dist(eos_data, data_train, data_val, data_test, figloc)
+
+        # Visualize current NN prediction surfaces
+        figloc = figdir+'surf_{0:05}'.format(i)
+        viz_eos_data(eos_data_scaled, scaled_data_train, scaled_data_val, scaled_data_test, figloc)
+
+        
+
     # Checkpoint model
     if (loss_test.detach().cpu().numpy() < save_error - save_eps):
 
