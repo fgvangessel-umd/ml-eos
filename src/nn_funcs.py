@@ -17,6 +17,7 @@ class EOSNeuralNetwork(nn.Module):
             nn.Linear(50, 50, dtype=dtype),
             nn.Tanh(),
             nn.Linear(50, 1, dtype=dtype),
+            #nn.ReLU(),
         )
 
     def forward(self, x):

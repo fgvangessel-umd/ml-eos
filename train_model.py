@@ -104,6 +104,10 @@ else:
                np.concatenate((mu.reshape(1,-1), sigma.reshape(1,-1)), axis=0), \
                 header=scaler_type, comments='')
 
+print(" Density   Int. Ener  Pressure     c^2        dPdr       dPde")
+print("{}". format("   ".join(f"{x:.2e}" for x in eos_data.min(axis=0))))
+print("{}". format("   ".join(f"{x:.2e}" for x in eos_data.max(axis=0))))
+
 X_train, X_val, X_test = inputs[0], inputs[1], inputs[2]
 y_train, y_val, y_test = targets[0], targets[1], targets[2]
 
@@ -184,6 +188,7 @@ for i in range(n_epochs):
     for j, arr in enumerate([MAR_train, MAR_val, MAR_test]):
         res_hist[i,j,:] = arr   # mean absolute residual
     
+    '''
     # Output progress to screen
     if (i % int(training_params['n_output_epochs']) == 0) or (i==n_epochs-1):
         # Output training data
@@ -200,6 +205,7 @@ for i in range(n_epochs):
         data_val = unscale_data(scaled_data_val, mu, sigma)
         data_test = unscale_data(scaled_data_test, mu, sigma)
 
+        
         # Visualize current prediction distribution
         figloc = figdir+'dist_{0:05}'.format(i)
         viz_pred_dist(eos_data, data_train, data_val, data_test, figloc)
@@ -207,8 +213,15 @@ for i in range(n_epochs):
         # Visualize current NN prediction surfaces
         figloc = figdir+'surf_{0:05}'.format(i)
         viz_eos_data(eos_data_scaled, scaled_data_train, scaled_data_val, scaled_data_test, figloc)
-
         
+
+        data = np.concatenate((data_train, data_val, data_test), axis=0)
+        print(" Density   Int. Ener  Pressure     c^2        dPdr       dPde")
+        print("{}". format("   ".join(f"{x:.2e}" for x in data.min(axis=0))))
+        print("{}". format("   ".join(f"{x:.2e}" for x in data.max(axis=0))))
+        print('\n\n')
+
+    '''
 
     # Checkpoint model
     if (loss_test.detach().cpu().numpy() < save_error - save_eps):
