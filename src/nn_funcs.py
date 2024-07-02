@@ -7,16 +7,17 @@ from utils.printarr import printarr
 ### Define NN architecture
 ###
 class EOSNeuralNetwork(nn.Module):
-    def __init__(self):
+    def __init__(self, dtype):
         super(EOSNeuralNetwork, self).__init__()
         self.linear_tanh_stack = nn.Sequential(
-            nn.Linear(2, 50, dtype=torch.float64),
+            nn.Linear(2, 50, dtype=dtype),
             nn.Tanh(),
-            nn.Linear(50, 50, dtype=torch.float64),
+            nn.Linear(50, 50, dtype=dtype),
             nn.Tanh(),
-            nn.Linear(50, 50, dtype=torch.float64),
+            nn.Linear(50, 50, dtype=dtype),
             nn.Tanh(),
-            nn.Linear(50, 1, dtype=torch.float64),
+            nn.Linear(50, 1, dtype=dtype),
+            #nn.ReLU(),
         )
 
     def forward(self, x):
