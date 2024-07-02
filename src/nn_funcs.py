@@ -4,7 +4,7 @@ from torch import nn
 from utils.printarr import printarr
 
 ###
-### Define NN architecture
+### Define NN architecture(s)
 ###
 class EOSNeuralNetwork(nn.Module):
     def __init__(self, dtype):
@@ -18,6 +18,24 @@ class EOSNeuralNetwork(nn.Module):
             nn.Tanh(),
             nn.Linear(50, 1, dtype=dtype),
             #nn.ReLU(),
+        )
+
+    def forward(self, x):
+        logits = self.linear_tanh_stack(x)
+        return logits
+
+class EOSNeuralNetworkPos(nn.Module):
+    def __init__(self, dtype):
+        super(EOSNeuralNetwork, self).__init__()
+        self.linear_tanh_stack = nn.Sequential(
+            nn.Linear(2, 50, dtype=dtype),
+            nn.Tanh(),
+            nn.Linear(50, 50, dtype=dtype),
+            nn.Tanh(),
+            nn.Linear(50, 50, dtype=dtype),
+            nn.Tanh(),
+            nn.Linear(50, 1, dtype=dtype),
+            nn.ReLU(),
         )
 
     def forward(self, x):

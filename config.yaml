@@ -10,6 +10,7 @@ ref_data_params:
     ngrid : 400
     sample_type : lhs
     scaler_type : minmax
+    nn_type: None
 
 scheduler_params:
     scheduler_name: 
