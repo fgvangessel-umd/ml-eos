@@ -20,6 +20,9 @@ scheduler_params:
     min_lr : 1e-5
     verbose : True
 
+network_params:
+    network_type: 'standard'
+
 training_params:
     lr: 1e-3
     n_epochs: 250

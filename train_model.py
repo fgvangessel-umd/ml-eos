@@ -54,6 +54,7 @@ with open('config.yaml') as file:
     scheduler_params   = config_list['scheduler_params']
     training_params    = config_list['training_params']
     checkpoint_params  = config_list['checkpoint_params']
+    network_params     = config_list['network_params']
 
     chckdir = output_dirs['checkpoint_dir']
     figdir  = output_dirs['figure_dir']
@@ -72,9 +73,19 @@ ngrid = int(ref_data_params['ngrid'])
 data_sample_type = ref_data_params['sample_type']
 scaler_type = ref_data_params['scaler_type']
 
-# Initialize network define optimizer, and set loss function
-net = EOSNeuralNetwork(dtype).to(device)
-net.apply(init_xavier)
+# Initialize network type, define optimizer, and set loss function
+if network_params['network_type'] == 'standard':
+    net = EOSNeuralNetwork(dtype).to(device)
+    net.apply(init_xavier)
+elif network_params['network_type'] == 'positive':
+    if scalar_type != 'minmax':
+        sys.exit('Scalar which scales targets to negative values not compatible with a \
+                  NN which always outputs positive values!')
+    net = EOSNeuralNetworkPos(dtype).to(device)
+    net.apply(init_xavier)
+else:
+    sys.exit('Selected network type not supported!')
+
 optimizer = torch.optim.Adam(net.parameters(), lr=float(training_params['lr']))
 
 # If checkpoint file exists load and initialize training
