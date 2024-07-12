@@ -141,8 +141,8 @@ def viz_pred_dist(eos_data, data_train, data_val, data_test, figloc):
 
     for i, dat in enumerate([data_train, data_val, data_test, data]):
         for j in range(nvars):
-            axs[i,j].hist(eos_data[:,2+j], bins=40, density=True, label='Ref. EOS')
-            axs[i,j].hist(dat[:, 2+j], bins=40, density=True, label='NN Pred.')
+            axs[i,j].hist(eos_data[:,2+j], bins=40, density=False, label='Ref. EOS')
+            axs[i,j].hist(dat[:, 2+j], bins=40, density=False, label='NN Pred.')
 
         axs[i,0]. set_ylabel(split_label[i], fontsize=20)
 

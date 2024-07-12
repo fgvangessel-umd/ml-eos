@@ -23,7 +23,7 @@ from torch import nn
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from src.data_funcs import gen_eos_data, vecs_to_array, jwl, scale_data, unscale_data, batch_training_data
-from src.nn_funcs import EOSNeuralNetwork, init_xavier, loss_calculation
+from src.nn_funcs import EOSNeuralNetwork, EOSNeuralNetworkPos, init_xavier, loss_calculation
 from src.viz_funcs import viz_train_loss, viz_pred_dist, viz_eos_data
 from src.monitor_funcs import plot_initial_dist, print_progress
 
@@ -78,13 +78,17 @@ if network_params['network_type'] == 'standard':
     net = EOSNeuralNetwork(dtype).to(device)
     net.apply(init_xavier)
 elif network_params['network_type'] == 'positive':
-    if scalar_type != 'minmax':
+    if scaler_type != 'minmax':
         sys.exit('Scalar which scales targets to negative values not compatible with a \
                   NN which always outputs positive values!')
     net = EOSNeuralNetworkPos(dtype).to(device)
     net.apply(init_xavier)
 else:
     sys.exit('Selected network type not supported!')
+
+X = torch.tensor([[0,0], [0,1], [1,0], [1,1], [0.5, 0.5]], dtype=dtype, requires_grad=True).to(device)
+print(X)
+print(net(X))
 
 optimizer = torch.optim.Adam(net.parameters(), lr=float(training_params['lr']))
 
@@ -199,7 +203,7 @@ for i in range(n_epochs):
     for j, arr in enumerate([MAR_train, MAR_val, MAR_test]):
         res_hist[i,j,:] = arr   # mean absolute residual
     
-    '''
+
     # Output progress to screen
     if (i % int(training_params['n_output_epochs']) == 0) or (i==n_epochs-1):
         # Output training data
@@ -231,8 +235,6 @@ for i in range(n_epochs):
         print("{}". format("   ".join(f"{x:.2e}" for x in data.min(axis=0))))
         print("{}". format("   ".join(f"{x:.2e}" for x in data.max(axis=0))))
         print('\n\n')
-
-    '''
 
     # Checkpoint model
     if (loss_test.detach().cpu().numpy() < save_error - save_eps):

@@ -26,7 +26,7 @@ class EOSNeuralNetwork(nn.Module):
 
 class EOSNeuralNetworkPos(nn.Module):
     def __init__(self, dtype):
-        super(EOSNeuralNetwork, self).__init__()
+        super(EOSNeuralNetworkPos, self).__init__()
         self.linear_tanh_stack = nn.Sequential(
             nn.Linear(2, 50, dtype=dtype),
             nn.Tanh(),

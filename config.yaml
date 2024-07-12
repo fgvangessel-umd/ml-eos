@@ -21,12 +21,12 @@ scheduler_params:
     verbose : True
 
 network_params:
-    network_type: 'standard'
+    network_type: 'positive'
 
 training_params:
     lr: 1e-3
     n_epochs: 250
-    n_output_epochs: 5
+    n_output_epochs: 5000000
     n_plot_epochs: 50_000
     batch_size: 8192
 
