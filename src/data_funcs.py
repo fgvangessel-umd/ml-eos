@@ -20,7 +20,7 @@ from torch import nn
 
 from utils.printarr import printarr
 
-def gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, n,device='cuda', data_sample_type='grid', scaler_type='standard', dtype=torch.float32):
+def gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, n, eos_type, device='cuda', data_sample_type='grid', scaler_type='standard', dtype=torch.float32):
     '''
     Function that generates eos data, density, internal energy, pressure, pressure derivatives, and sound velocity (both scaled and unscaled)
     '''
@@ -42,7 +42,13 @@ def gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, n,device='cuda', 
 
 
     # Calculate pressure and sound velocity (squared) for each density-energy pair
-    P, c2, dPdr, dPde = jwl(X[:,0], X[:,1], mtl_params)
+    if eos_type == 'nasg':
+        print(mtl_params)
+        P, c2, dPdr, dPde = nasg(X[:,0], X[:,1], mtl_params)
+    elif eos_type == 'jwl':
+        P, c2, dPdr, dPde = jwl(X[:,0], X[:,1], mtl_params)
+    else:
+        sys.exit('EOS fype not supported')
 
     # Combine JWL EOS data into reference array. We will always keep the ordering convention
     #  [rho, e, P, c2, dPdr, dPde]    or
@@ -115,6 +121,21 @@ def jwl(r, e, mtl_params):
     
     # Calculate sound velocity
     c2   = dPdr + P/r**2*dPde
+
+    return P, c2, dPdr, dPde
+
+def nasg(r, e, mtl_params):
+    ''' Calculate pressure and squared sound velocity given JWL mtl parameters'''
+    C_p, C_v, gamma, P_inf, b, q, qq = mtl_params['C_p'], mtl_params['C_v'], mtl_params['gamma'], \
+                          mtl_params['P_inf'], mtl_params['b'], mtl_params['q'], mtl_params['qq']
+                          
+    v = 1/r
+
+    P = (gamma-1)*(e-q)/(v-b) - gamma*P_inf
+    c2 = gamma*v**2*(P+P_inf)/(v-b)
+
+    dPdr = (gamma-1)*(e-q)/(1-r*b)**2
+    dPde = (gamma-1)/(v-b)
 
     return P, c2, dPdr, dPde
 

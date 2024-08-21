@@ -63,6 +63,7 @@ with open('config.yaml') as file:
 ###
 
 # Load EOS var bounds and define data grid density
+eos_type = ref_data_params['eos_type']
 rho_min, rho_max = [float(r) for r in ref_data_params['rho_bounds']]
 ei_min, ei_max = [float (ei) for ei in ref_data_params['ei_bounds']]
 mtl_params = {}
@@ -89,14 +90,14 @@ if my_file.is_file():
 
     # Generate data but use pre-existing scaling parameters for normalization
     eos_data, eos_data_scaled, mu, sigma, inputs, targets =\
-        gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, ngrid,\
+        gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, ngrid, eos_type,\
                         device=device, data_sample_type=data_sample_type, scaler_type=\
                          chckdir+'scaling.txt', dtype=dtype)
 
 else:
     # Generate reference EOS data and create train/validation/test split
     eos_data, eos_data_scaled, mu, sigma, inputs, targets =\
-        gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, ngrid,\
+        gen_eos_data(mtl_params, rho_min, rho_max, ei_min, ei_max, ngrid, eos_type,\
                         device=device, data_sample_type=data_sample_type, scaler_type=scaler_type, dtype=dtype)
 
     # Save scaling factors (mu/sigma)
@@ -110,6 +111,8 @@ print("{}". format("   ".join(f"{x:.2e}" for x in eos_data.max(axis=0))))
 
 X_train, X_val, X_test = inputs[0], inputs[1], inputs[2]
 y_train, y_val, y_test = targets[0], targets[1], targets[2]
+
+sys.exit('Testing')
 
 # Visualize initial data distributions
 plot_initial_dist(eos_data, inputs, targets)
